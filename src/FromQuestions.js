@@ -3,6 +3,8 @@ import React, { Component } from 'react'
 import axios from 'axios';
 
 class FromQuestions extends Component {
+  
+
     state = {
         "soru": null,
         "cevap1": null,
@@ -12,6 +14,7 @@ class FromQuestions extends Component {
         "cevap5": null,
         "subject": null,
         "correct": null,
+        "isButton":false
     };
 
     onChange = (event) => {
@@ -38,7 +41,19 @@ class FromQuestions extends Component {
             "subject": this.state.subject,
             "correct": this.state.correct
         }
+
+        this.setState({isButton:true})
+        console.log(this.state.isButton)
+
         axios.post('http://localhost:8093/api/save', body)
+        .then((response)=>{
+            this.setState({isButton:false})
+         console.log(this.state.isButton)
+        }).catch(err=>{
+            this.setState({isButton:false})
+            console.log(this.state.Button)
+        })
+
 
     }
 
@@ -46,7 +61,7 @@ class FromQuestions extends Component {
 
     render() {
         return (
-            <form>
+            <form className='form-group'>
                 <div className="mb-3">
                     <label for="exampleInputEmail1" className="form-label">SORU</label>
                     <input name='soru' onChange={this.onChange} type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" />
@@ -81,7 +96,9 @@ class FromQuestions extends Component {
                     <input name='correct' onChange={this.onChange} className="form-control" id="exampleInputPassword1" />
                 </div>
 
-                <button onClick={this.onSubmit} type="submit" className="btn btn-primary">Submit</button>
+              <div className='text-center container'>
+              <button disabled={this.state.isButton} onClick={this.onSubmit} type="submit" className="btn btn-primary">Submit</button>
+              </div>
             </form>
         )
     }
