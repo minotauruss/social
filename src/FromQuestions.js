@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react'
-import axios from 'axios';
+import{signUp} from "./Api.js"
 
 class FromQuestions extends Component {
   
@@ -14,15 +14,21 @@ class FromQuestions extends Component {
         "cevap5": null,
         "subject": null,
         "correct": null,
-        "isButton":false
+        "isButton":false,
+        "errorObject":{}
     };
 
     onChange = (event) => {
 
         const { name, value } = event.target;
+        const errorObject = {... this.state.errorObject};
+        errorObject["path"] = undefined;
+
 
         this.setState({
-            [name]: value
+            [name]: value,
+            errorObject
+
         });
 
     };
@@ -43,15 +49,20 @@ class FromQuestions extends Component {
         }
 
         this.setState({isButton:true})
-        console.log(this.state.isButton)
+     
 
-        axios.post('http://localhost:8093/api/save', body)
+        signUp(body)
         .then((response)=>{
             this.setState({isButton:false})
-         console.log(this.state.isButton)
+            this.setState({errorObject:response.data})
+            console.log(this.state.errorObject)
+
+        
         }).catch(err=>{
             this.setState({isButton:false})
-            console.log(this.state.Button)
+            this.setState({errorObject:err.response.data})
+            console.log(this.state.errorObject)
+            
         })
 
 
@@ -60,12 +71,30 @@ class FromQuestions extends Component {
 
 
     render() {
+
+
         return (
             <form className='form-group'>
+                  <div className="col-md-4">
+    <label for="validationServer01" class="form-label">First name</label>
+    <input type="text" onChange={this.onChange} className={this.state.errorObject.path ? "form-control is-valid" : "form-control"}id="validationServer01" required/>
+    <div className="valid-feedback">
+      {this.state.errorObject.path}
+    </div>
+  </div>
+
+
+
+
+
+
+
                 <div className="mb-3">
                     <label for="exampleInputEmail1" className="form-label">SORU</label>
-                    <input name='soru' onChange={this.onChange} type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" />
-
+                    <input name='soru' onChange={this.onChange} type="email" className={this.state.errorObject.path ? "form-control is-valid" : "form-control"} id="exampleInputEmail1" aria-describedby="emailHelp" />
+                    <div className="valid-feedback">
+     {this.state.errorObject.path}
+    </div>
                 </div>
                 <div className="mb-3">
                     <label for="exampleInputPassword1" className="form-label">CEVAP 1</label>
@@ -97,7 +126,9 @@ class FromQuestions extends Component {
                 </div>
 
               <div className='text-center container'>
-              <button disabled={this.state.isButton} onClick={this.onSubmit} type="submit" className="btn btn-primary">Submit</button>
+              <button disabled={this.state.isButton} onClick={this.onSubmit} type="submit" className="btn btn-primary">
+                {this.state.isButton && <span className='spinner-border spinner-border-sm'></span>} Sign Up
+              </button>
               </div>
             </form>
         )
